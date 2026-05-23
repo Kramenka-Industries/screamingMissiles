@@ -186,7 +186,7 @@ namespace AIM9XMod.Services
 
             TraceRuntimeState(hasWeaponContext, hasRadarHardLock, targetSlavedMode, selectedTargetName);
 
-            UpdateGrowlFromCue(hasWeaponContext, ownAircraft, ws, viewDir, targetSlavedMode, assignmentTargets);
+            UpdateGrowlFromCue(hasWeaponContext, ownAircraft, ws, viewDir, targetSlavedMode, hasRadarHardLock, assignmentTargets);
         }
 
         private void RunSelectedTargetCue(Aircraft ownAircraft, WeaponStation ws, Unit selectedTarget)
@@ -293,9 +293,14 @@ namespace AIM9XMod.Services
             SeekerCueState.SetPrelaunchCue(bestUnit, bestScore, bestAngle, bestDistance, bestHeat);
         }
 
-        private void UpdateGrowlFromCue(bool irMissileSelected, Aircraft ownAircraft, WeaponStation ws, Vector3 viewDir, bool targetSlavedMode, List<Unit> assignmentTargets)
+        private void UpdateGrowlFromCue(bool irMissileSelected, Aircraft ownAircraft, WeaponStation ws, Vector3 viewDir, bool targetSlavedMode, bool hasRadarHardLock, List<Unit> assignmentTargets)
         {
             bool viewCenterInCone = IsViewCenterWithinAircraftForwardCone(ownAircraft, viewDir);
+
+            // When radar lock is active but the target has left the offboresight angle area,
+            // hide the manual view lock circles so they don't mislead the pilot.
+            if (hasRadarHardLock && !targetSlavedMode)
+                viewCenterInCone = false;
 
             if (!irMissileSelected)
             {
