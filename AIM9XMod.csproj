@@ -18,10 +18,10 @@
 
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
-      <HintPath>../../Assembly-CSharp.dll</HintPath>
+      <HintPath>./Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="Mirage">
-      <HintPath>../../Mirage.dll</HintPath>
+      <HintPath>./Mirage.dll</HintPath>
     </Reference>
   </ItemGroup>
 </Project>
