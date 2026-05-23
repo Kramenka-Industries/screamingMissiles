@@ -85,7 +85,7 @@ namespace AIM9XMod
             PrelaunchCueAngle = Config.Bind("Cueing", "PrelaunchCueAngle", 12f,
                 "Half-angle (degrees) around center-screen used for pre-launch seeker cue candidate selection.");
 
-            GrowlVolume = Config.Bind("Audio", "GrowlVolume", 0.6f,
+            GrowlVolume = Config.Bind("Audio", "GrowlVolume", 0.1f,
                 "Master growl volume (0-1)");
             EnableWavProfileAudio = Config.Bind("Audio", "EnableWavProfileAudio", true,
                 "Use WAV files for seeker standby and lock tones.");
