@@ -20,8 +20,8 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
-      - name: Setup BepInEx NuGet source
-        run: dotnet nuget add source https://nuget.bepinex.dev/v3/index.json --name bepinex --skip-duplicate
+      #- name: Setup BepInEx NuGet source
+      #  run: dotnet nuget add source https://nuget.bepinex.dev/v3/index.json --name bepinex
 
       - name: Restore dependencies
         run: dotnet restore
