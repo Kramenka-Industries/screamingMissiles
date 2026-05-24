@@ -40,6 +40,7 @@ namespace AIM9XMod
         public static ConfigEntry<bool> FallbackToSyntheticAudio;
         public static ConfigEntry<float> LaunchMuteSeconds;
         public static ConfigEntry<bool> ShowDetectionPercentDebug;
+        public static ConfigEntry<bool> ShowLoalTargetDebug;
         public static ConfigEntry<float> PrelaunchCueAngle;
         public static ConfigEntry<float> WobbleMaxOffset;
         public static ConfigEntry<float> WobbleSpeed;
@@ -105,6 +106,9 @@ namespace AIM9XMod
                 "How long to mute seeker growl after detecting an IR missile launch (seconds).");
             ShowDetectionPercentDebug = Config.Bind("Debug", "ShowDetectionPercentDebug", false,
                 "Show seeker detection percentage text in HUD (debug output).");
+            ShowLoalTargetDebug = Config.Bind("Debug", "ShowLoalTargetDebug", false,
+                "Log verbose LOAL target-assignment and scan details to BepInEx console. " +
+                "Enable when debugging diamond-target priority issues.");
 
             WobbleMaxOffset = Config.Bind("Overlay", "WobbleMaxOffset", 14f,
                 "Maximum pixel displacement of the diamond target indicator when detection is at 0%%. " +

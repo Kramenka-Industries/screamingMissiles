@@ -56,6 +56,14 @@ namespace AIM9XMod.Patches
         private static readonly FieldInfo HudTargetListField = typeof(CombatHUD).GetField(
             "targetList", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 
+        private static bool LoalDebug => Plugin.ShowLoalTargetDebug != null && Plugin.ShowLoalTargetDebug.Value;
+
+        private static void LogLoal(string msg)
+        {
+            if (LoalDebug)
+                Plugin.Log.LogInfo("[LOAL-DBG] " + msg);
+        }
+
         /// <summary>
         /// Get the total IR intensity of a unit by summing all non-flare IR sources.
         /// </summary>
@@ -87,26 +95,47 @@ namespace AIM9XMod.Patches
         {
             targetList = null;
             if (missile == null || missile.owner == null || HudTargetListField == null)
+            {
+                LogLoal("TryGetHudTargetListForOwner: null missile/owner/field");
                 return false;
+            }
 
             var hud = SceneSingleton<CombatHUD>.i;
             if (hud == null || hud.aircraft == null)
+            {
+                LogLoal("TryGetHudTargetListForOwner: CombatHUD or aircraft is null");
                 return false;
+            }
 
             if (hud.aircraft.persistentID != missile.owner.persistentID)
+            {
+                LogLoal("TryGetHudTargetListForOwner: HUD aircraft != missile owner (AI missile)");
                 return false;
+            }
 
             try
             {
                 var raw = HudTargetListField.GetValue(hud) as List<Unit>;
                 if (raw == null || raw.Count == 0)
+                {
+                    LogLoal("TryGetHudTargetListForOwner: CombatHUD.targetList is null or empty");
                     return false;
+                }
+
+                if (LoalDebug)
+                {
+                    var names = new System.Text.StringBuilder();
+                    for (int i = 0; i < raw.Count; i++)
+                        names.Append(raw[i] != null ? raw[i].unitName : "null").Append(", ");
+                    LogLoal($"TryGetHudTargetListForOwner: targetList has {raw.Count} entries: [{names}]");
+                }
 
                 targetList = raw;
                 return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                LogLoal($"TryGetHudTargetListForOwner: exception reading targetList: {ex.Message}");
                 return false;
             }
         }
@@ -149,18 +178,26 @@ namespace AIM9XMod.Patches
         private static bool TryAssignPreferredTarget(Missile missile, Unit candidateTarget, string sourceLabel)
         {
             if (!IsValidEnemyTargetForMissile(missile, candidateTarget))
+            {
+                LogLoal($"TryAssignPreferredTarget [{sourceLabel}]: {(candidateTarget != null ? candidateTarget.unitName : "null")} rejected — failed IsValidEnemyTargetForMissile");
                 return false;
+            }
 
             Vector3 ownerForward = missile.owner.transform.forward;
             Vector3 ownerPosition = missile.owner.transform.position;
             float offBoresightAngle = Mathf.Max(1f, Plugin.OffBoresightAngle.Value);
 
             Vector3 toTarget = candidateTarget.transform.position - ownerPosition;
-            if (Vector3.Angle(ownerForward, toTarget) > offBoresightAngle)
+            float angle = Vector3.Angle(ownerForward, toTarget);
+            if (angle > offBoresightAngle)
+            {
+                LogLoal($"TryAssignPreferredTarget [{sourceLabel}]: {candidateTarget.unitName} rejected — angle {angle:F1}° > offBoresight {offBoresightAngle:F1}°");
                 return false;
+            }
 
             preferredTargetByMissileId[missile.GetInstanceID()] = candidateTarget.persistentID;
             Plugin.Log.LogDebug($"[LOAL] Assigned preferred target {candidateTarget.unitName} for missile {missile.GetInstanceID()} via {sourceLabel}.");
+            LogLoal($"TryAssignPreferredTarget [{sourceLabel}]: assigned {candidateTarget.unitName} (angle {angle:F1}°)");
             return true;
         }
 
@@ -178,7 +215,7 @@ namespace AIM9XMod.Patches
             Vector3 ownerForward = missile.owner.transform.forward;
             Vector3 ownerPosition = missile.owner.transform.position;
 
-            for (int i = 0; i < hudTargets.Count; i++)
+            for (int i = hudTargets.Count - 1; i >= 0; i--)
             {
                 var candidate = hudTargets[i];
                 if (!IsValidEnemyTargetForMissile(missile, candidate))
@@ -214,18 +251,58 @@ namespace AIM9XMod.Patches
             return false;
         }
 
+        private static bool AssignPreferredTargetFromHudSelectedTarget(Missile missile)
+        {
+            if (missile == null || missile.owner == null)
+                return false;
+
+            List<Unit> hudTargets;
+            if (!TryGetHudTargetListForOwner(missile, out hudTargets))
+            {
+                LogLoal("AssignPreferredTargetFromHudSelectedTarget: no HUD target list available");
+                return false;
+            }
+
+            // CombatHUD.targetList behaves as a LIFO stack, where the last valid
+            // entry is the currently diamond-marked target in the UI.
+            LogLoal($"AssignPreferredTargetFromHudSelectedTarget: trying {hudTargets.Count} HUD targets (LIFO order)");
+            for (int i = hudTargets.Count - 1; i >= 0; i--)
+            {
+                Unit candidate = hudTargets[i];
+                if (TryAssignPreferredTarget(missile, candidate, "HUD.targetList(selected)"))
+                    return true;
+            }
+
+            LogLoal("AssignPreferredTargetFromHudSelectedTarget: no valid candidate found in HUD target list");
+            return false;
+        }
+
         private static bool AssignPreferredTargetFromPrelaunchCue(Missile missile)
         {
             if (missile == null || missile.owner == null)
                 return false;
 
+            var hud = SceneSingleton<CombatHUD>.i;
+            if (hud == null || hud.aircraft == null || hud.aircraft.persistentID != missile.owner.persistentID)
+            {
+                LogLoal("AssignPreferredTargetFromPrelaunchCue: skipped (missile owner is not current HUD aircraft)");
+                return false;
+            }
+
             CueTargetInfo cue;
             if (!SeekerCueState.TryGetPrelaunchCue(out cue, 0.5f))
+            {
+                LogLoal("AssignPreferredTargetFromPrelaunchCue: no valid prelaunch cue within 0.5s");
                 return false;
+            }
 
             if (cue.target == null)
+            {
+                LogLoal("AssignPreferredTargetFromPrelaunchCue: prelaunch cue has null target");
                 return false;
+            }
 
+            LogLoal($"AssignPreferredTargetFromPrelaunchCue: cue target is {cue.target.unitName} (angle {cue.angleDeg:F1}°, dist {cue.distance:F0}m, heat {cue.heat:F2})");
             return TryAssignPreferredTarget(missile, cue.target, "SeekerCueState.PrelaunchCue");
         }
 
@@ -346,8 +423,20 @@ namespace AIM9XMod.Patches
             peakObservedIR[id] = new Dictionary<PersistentID, float>();
             flareEvadedUnits[id] = new Dictionary<PersistentID, float>();
 
-            if (!AssignPreferredTargetFromHudList(missile))
+            if (!AssignPreferredTargetFromHudSelectedTarget(missile)
+                && !AssignPreferredTargetFromHudList(missile))
+            {
                 AssignPreferredTargetFromPrelaunchCue(missile);
+            }
+
+            if (LoalDebug)
+            {
+                Unit assigned;
+                string assignedName = TryGetAssignedPreferredTarget(missile, out assigned)
+                    ? assigned.unitName
+                    : "NONE";
+                LogLoal($"Launch assignment result for missile {id}: preferred target = {assignedName}");
+            }
 
             // Check if the target is outside the seeker cone at launch.
             // This handles rear-hemisphere shots: the missile fires forward,
@@ -515,11 +604,39 @@ namespace AIM9XMod.Patches
                                     bestAngle = preferredAngle;
                                     bestDistance = preferredDist;
                                     bestHeat = preferredHeat;
+                                    LogLoal($"Scan: preferred target {preferred.unitName} accepted (angle {preferredAngle:F1}°, dist {preferredDist:F0}m, heat {preferredHeat:F2}) — score -1000");
+                                }
+                                else
+                                {
+                                    LogLoal($"Scan: preferred target {preferred.unitName} REJECTED — IRSource null or is-flare (source={(preferredSource == null ? "null" : "flare")})");
                                 }
                             }
+                            else
+                            {
+                                LogLoal($"Scan: preferred target {preferred.unitName} REJECTED — relock blocked by flare evasion (heat {preferredHeat:F2} <= evasion threshold)");
+                            }
+                        }
+                        else
+                        {
+                            LogLoal($"Scan: preferred target {preferred.unitName} REJECTED — zero IR heat");
                         }
                     }
+                    else
+                    {
+                        if (preferredAngle > searchAngle)
+                            LogLoal($"Scan: preferred target {preferred.unitName} REJECTED — angle {Vector3.Angle(missileForward, toPreferred):F1}° > searchAngle {searchAngle:F1}° (missile seeker cone)");
+                        else
+                            LogLoal($"Scan: preferred target {preferred.unitName} REJECTED — terrain LOS blocked");
+                    }
                 }
+                else
+                {
+                    LogLoal($"Scan: preferred target {preferred.unitName} REJECTED — dist {preferredDist:F0}m out of range [50, {maxRange:F0}]");
+                }
+            }
+            else
+            {
+                LogLoal("Scan: no preferred target assigned for this missile");
             }
 
             for (int i = 0; i < UnitRegistry.allUnits.Count; i++)
@@ -611,6 +728,15 @@ namespace AIM9XMod.Patches
 
                 Plugin.Log.LogDebug(
                     $"[LOAL] Acquired lock on {bestTarget.unitName} at {bestScore:F1} score");
+
+                if (LoalDebug)
+                {
+                    Unit pref;
+                    bool hadPreferred = TryGetAssignedPreferredTarget(missile, out pref);
+                    bool lockedPreferred = hadPreferred && pref != null && pref.persistentID == bestTarget.persistentID;
+                    LogLoal($"Lock acquired: {bestTarget.unitName} (score {bestScore:F1}, angle {bestAngle:F1}°, dist {bestDistance:F0}m)" +
+                        (lockedPreferred ? " — PREFERRED TARGET ✓" : (hadPreferred && pref != null ? $" — OVERRODE preferred target {pref.unitName}!" : " — no preferred target was set")));
+                }
             }
             else
             {
@@ -654,7 +780,7 @@ namespace AIM9XMod.Patches
         [HarmonyPostfix]
         public static void IRSeeker_OnTargetFlare_Postfix(
             IRSeeker __instance,
-            FlareEvasionSnapshot __state)
+            ref FlareEvasionSnapshot __state)
         {
             if (!Plugin.EnableLOAL.Value || !__state.valid) return;
 
