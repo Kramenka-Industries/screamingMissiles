@@ -182,9 +182,6 @@ namespace AIM9XMod.Services
                 DrawLine(new Vector2(x0, y0), new Vector2(x1, y1), 2f);
             }
 
-            DrawLine(new Vector2(cx - 10f, cy), new Vector2(cx + 10f, cy), 2f);
-            DrawLine(new Vector2(cx, cy - 10f), new Vector2(cx, cy + 10f), 2f);
-
             GUI.color = previous;
         }
 
