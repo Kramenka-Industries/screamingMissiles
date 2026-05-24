@@ -515,6 +515,9 @@ namespace AIM9XMod.Services
             if (!GameManager.GetLocalAircraft(out ownAircraft) || ownAircraft == null)
                 return false;
 
+            if (!IsPlayerAircraftAvailableForCueing(ownAircraft))
+                return false;
+
             var hud = SceneSingleton<CombatHUD>.i;
             if (hud == null)
                 return false;
@@ -531,6 +534,66 @@ namespace AIM9XMod.Services
                 return false;
 
             viewDirection = cam.transform.forward;
+            return true;
+        }
+
+        private static bool IsPlayerAircraftAvailableForCueing(Aircraft ownAircraft)
+        {
+            if (ownAircraft == null || ownAircraft.disabled)
+                return false;
+
+            string[] hiddenWhenTrueFlags =
+            {
+                "isDead",
+                "IsDead",
+                "dead",
+                "Dead",
+                "pilotDead",
+                "PilotDead",
+                "isEjecting",
+                "IsEjecting",
+                "ejecting",
+                "Ejecting",
+                "pilotEjected",
+                "PilotEjected",
+                "hasEjected",
+                "HasEjected",
+                "isBailingOut",
+                "IsBailingOut",
+                "bailingOut",
+                "BailingOut"
+            };
+
+            for (int i = 0; i < hiddenWhenTrueFlags.Length; i++)
+            {
+                bool flagValue;
+                if (TryGetBoolFromMember(ownAircraft, hiddenWhenTrueFlags[i], out flagValue) && flagValue)
+                    return false;
+            }
+
+            string[] requiredTrueFlags =
+            {
+                "isPlayerControlled",
+                "IsPlayerControlled",
+                "playerControlled",
+                "PlayerControlled",
+                "hasPlayerControl",
+                "HasPlayerControl",
+                "isLocalPlayerControlled",
+                "IsLocalPlayerControlled",
+                "hasPilot",
+                "HasPilot",
+                "pilotPresent",
+                "PilotPresent"
+            };
+
+            for (int i = 0; i < requiredTrueFlags.Length; i++)
+            {
+                bool flagValue;
+                if (TryGetBoolFromMember(ownAircraft, requiredTrueFlags[i], out flagValue) && !flagValue)
+                    return false;
+            }
+
             return true;
         }
 
