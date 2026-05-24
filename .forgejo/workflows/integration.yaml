@@ -4,7 +4,21 @@
 name: .NET
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      versionTag:
+        description: 'Version tag to release'
+        required: true
+        type: string
+      releaseNotes:
+        description: 'Release notes to display'
+        required: true
+        type: string
+      isPrerelease:
+        description: 'Mark as prerelease'
+        required: true
+        default: false
+        type: boolean
   push:
     branches: [ $default-branch ]
   pull_request:
@@ -51,7 +65,8 @@ jobs:
         url: https://git.pr0.tech/
         repo: rs/screamingMissiles
         token: ${{ secrets.WRITE_TOKEN }}
-        tag: v1.1.0
+        tag: ${{ inputs.versionTag }}
         release-dir: release
-        release-notes: "HELLO WORLD"
+        release-notes: ${{ inputs.releaseNotes }}
+        prerelease: ${{ inputs.isPrerelease }}
 
