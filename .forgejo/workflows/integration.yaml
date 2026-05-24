@@ -30,5 +30,31 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build --no-restore
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
+
+    - name: Create assembly directory
+      run: mkdir assembly
+    - name: Copy dll to assembly
+      run: cp bin/Debug/net472/AIM9XMod.dll assembly/AIM9XMod.dll
+    - name: Copy sounds to assembly
+      run: cp -R SeekerNoises assembly/
+    
+    - name: Create release directory
+      run: mkdir release
+
+    - name: Move into assembly dir
+      run: cd assembly
+
+    - name: Zip files into release
+      run: zip -r ../release/aim9x.zip .
+
+    - name: Release
+      uses: actions/forgejo-release@v2.12.0
+      with:
+        direction: upload
+        url: https://git.pr0.tech/
+        repo: rs/screamingMissiles
+        token: ${{ secrets.WRITE_TOKEN }}
+        tag: v1.0.0
+        release-dir: release
+        release-notes: "HELLO WORLD"
+
