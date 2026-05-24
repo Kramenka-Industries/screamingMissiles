@@ -178,7 +178,7 @@ namespace AIM9XMod.Patches
             Vector3 ownerForward = missile.owner.transform.forward;
             Vector3 ownerPosition = missile.owner.transform.position;
 
-            for (int i = 0; i < hudTargets.Count; i++)
+            for (int i = hudTargets.Count - 1; i >= 0; i--)
             {
                 var candidate = hudTargets[i];
                 if (!IsValidEnemyTargetForMissile(missile, candidate))
@@ -209,6 +209,27 @@ namespace AIM9XMod.Patches
             {
                 Plugin.Log.LogDebug($"[LOAL] HUD assignment slot {selectedIndex + 1}/{validTargets.Count} for owner {ownerId}.");
                 return true;
+            }
+
+            return false;
+        }
+
+        private static bool AssignPreferredTargetFromHudSelectedTarget(Missile missile)
+        {
+            if (missile == null || missile.owner == null)
+                return false;
+
+            List<Unit> hudTargets;
+            if (!TryGetHudTargetListForOwner(missile, out hudTargets))
+                return false;
+
+            // CombatHUD.targetList behaves as a LIFO stack, where the last valid
+            // entry is the currently diamond-marked target in the UI.
+            for (int i = hudTargets.Count - 1; i >= 0; i--)
+            {
+                Unit candidate = hudTargets[i];
+                if (TryAssignPreferredTarget(missile, candidate, "HUD.targetList(selected)"))
+                    return true;
             }
 
             return false;
@@ -346,8 +367,11 @@ namespace AIM9XMod.Patches
             peakObservedIR[id] = new Dictionary<PersistentID, float>();
             flareEvadedUnits[id] = new Dictionary<PersistentID, float>();
 
-            if (!AssignPreferredTargetFromHudList(missile))
+            if (!AssignPreferredTargetFromHudSelectedTarget(missile)
+                && !AssignPreferredTargetFromHudList(missile))
+            {
                 AssignPreferredTargetFromPrelaunchCue(missile);
+            }
 
             // Check if the target is outside the seeker cone at launch.
             // This handles rear-hemisphere shots: the missile fires forward,
