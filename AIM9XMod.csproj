@@ -14,14 +14,7 @@
     <PackageReference Include="BepInEx.Core" Version="5.*" />
     <PackageReference Include="BepInEx.PluginInfoProps" Version="1.*" />
     <PackageReference Include="UnityEngine.Modules" Version="2021.3.33" IncludeAssets="compile" />
+    <PackageReference Include="stafelstr.nonuget" Version="1.0.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>./Assembly-CSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="Mirage">
-      <HintPath>./Mirage.dll</HintPath>
-    </Reference>
-  </ItemGroup>
 </Project>
