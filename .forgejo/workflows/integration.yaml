@@ -44,8 +44,8 @@ jobs:
     - name: Move into assembly dir
       run: cd assembly
 
-    - name: Zip files into release
-      run: gzip -r . > ../release/aim9x.gz
+    - name: Compress files into release
+      run: tar -czvf ../release/aim9x.tar.gz ./
 
     - name: Release
       uses: actions/forgejo-release@v2.12.0
