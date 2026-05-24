@@ -54,14 +54,15 @@ namespace AIM9XMod.Services
 
             float cx = Screen.width * 0.5f;
             float cy = Screen.height * 0.5f;
-            float lockRadius = Mathf.Lerp(42f, 74f, Mathf.Clamp01(_strength));
+            float lockRadius = Mathf.Lerp(84f, 148f, Mathf.Clamp01(_strength));
 
             if (!_targetSlaved && _viewCenterInCone)
             {
-                float searchRadius = 116f;
-                float expandedLockRadius = lockRadius * 2f;
+                float searchRadius = 220f;
                 DrawRing(cx, cy, searchRadius, new Color(0.08f, 1f, 0.08f, 0.42f));
-                DrawRing(cx, cy, expandedLockRadius, new Color(0.08f, 1f, 0.08f, 0.62f));
+                if (_strength > 0.21f) { // only draw lock radius if we have a lock on candidate
+                    DrawRing(cx, cy, lockRadius, new Color(0.08f, 1f, 0.08f, 0.20f));
+                }
             }
 
             bool drewAssignedTargets = false;
@@ -99,6 +100,7 @@ namespace AIM9XMod.Services
                 float detectionPct = Mathf.Round(_detectionRate * 100f);
                 string debugSuffix = "  [" + detectionPct.ToString("F0") + "%]";
                 GUI.Label(new Rect(cx - 180f, cy + lockRadius + 8f, 360f, 24f), "SEEKER: " + label + debugSuffix, _style);
+                GUI.Label(new Rect(cx - 180f, cy + lockRadius + 25f, 360f, 24f), "STR: " + _strength.ToString() + debugSuffix, _style);
             }
         }
 
