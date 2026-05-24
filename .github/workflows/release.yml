@@ -1,0 +1,51 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - '*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Setup BepInEx NuGet source
+        run: dotnet nuget add source https://nuget.bepinex.dev/v3/index.json --name bepinex
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Create assembly directory
+        run: mkdir assembly
+
+      - name: Copy DLL to assembly
+        run: cp bin/Release/net472/AIM9XMod.dll assembly/AIM9XMod.dll
+
+      - name: Copy sounds to assembly
+        run: cp -R SeekerNoises assembly/
+
+      - name: Create release directory
+        run: mkdir release
+
+      - name: Compress files into release
+        run: cd assembly && tar -czvf ../release/aim9x.tar.gz ./
+
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release/aim9x.tar.gz
+          generate_release_notes: true
