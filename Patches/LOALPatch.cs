@@ -282,6 +282,13 @@ namespace AIM9XMod.Patches
             if (missile == null || missile.owner == null)
                 return false;
 
+            var hud = SceneSingleton<CombatHUD>.i;
+            if (hud == null || hud.aircraft == null || hud.aircraft.persistentID != missile.owner.persistentID)
+            {
+                LogLoal("AssignPreferredTargetFromPrelaunchCue: skipped (missile owner is not current HUD aircraft)");
+                return false;
+            }
+
             CueTargetInfo cue;
             if (!SeekerCueState.TryGetPrelaunchCue(out cue, 0.5f))
             {
