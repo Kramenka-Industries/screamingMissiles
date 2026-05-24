@@ -106,10 +106,10 @@ namespace AIM9XMod
             ShowDetectionPercentDebug = Config.Bind("Debug", "ShowDetectionPercentDebug", false,
                 "Show seeker detection percentage text in HUD (debug output).");
 
-            WobbleMaxOffset = Config.Bind("Overlay", "WobbleMaxOffset", 12f,
+            WobbleMaxOffset = Config.Bind("Overlay", "WobbleMaxOffset", 14f,
                 "Maximum pixel displacement of the diamond target indicator when detection is at 0%%. " +
                 "Scales smoothly to zero at 60%% detection. Set to 0 to disable wobble.");
-            WobbleSpeed = Config.Bind("Overlay", "WobbleSpeed", 1f,
+            WobbleSpeed = Config.Bind("Overlay", "WobbleSpeed", 1.3f,
                 "Speed multiplier for the diamond indicator wobble oscillation. " +
                 "Higher values produce faster, more erratic movement.");
 
