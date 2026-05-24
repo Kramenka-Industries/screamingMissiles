@@ -773,7 +773,7 @@ namespace AIM9XMod.Patches
         [HarmonyPostfix]
         public static void IRSeeker_OnTargetFlare_Postfix(
             IRSeeker __instance,
-            FlareEvasionSnapshot __state)
+            ref FlareEvasionSnapshot __state)
         {
             if (!Plugin.EnableLOAL.Value || !__state.valid) return;
 
