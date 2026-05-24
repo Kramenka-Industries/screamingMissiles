@@ -41,11 +41,8 @@ jobs:
     - name: Create release directory
       run: mkdir release
 
-    - name: Move into assembly dir
-      run: cd assembly
-
     - name: Compress files into release
-      run: tar -czvf ../release/aim9x.tar.gz ./
+      run: cd assembly && tar -czvf ../release/aim9x.tar.gz ./
 
     - name: Release
       uses: actions/forgejo-release@v2.12.0
