@@ -44,6 +44,9 @@ jobs:
     - name: Move into assembly dir
       run: cd assembly
 
+    - name: Install zip
+      run: sudo apt install -y zip
+
     - name: Zip files into release
       run: zip -r ../release/aim9x.zip .
 
