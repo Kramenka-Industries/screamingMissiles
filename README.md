@@ -10,24 +10,21 @@ Adds AIM-9X-class capabilities to all IR-seeking missiles in Nuclear Option:
 
 ## Building
 
-1. Copy the following DLLs from your game install into a `lib/` folder at the workspace root:
-   - `NuclearOption_Data/Managed/Assembly-CSharp.dll`
-   - `NuclearOption_Data/Managed/UnityEngine.AudioModule.dll`
-   - `NuclearOption_Data/Managed/UnityEngine.CoreModule.dll`
-   - `NuclearOption_Data/Managed/UnityEngine.IMGUIModule.dll`
-   - `NuclearOption_Data/Managed/UnityEngine.PhysicsModule.dll`
-   - `NuclearOption_Data/Managed/UniTask.dll`
+1. Add the bepinex nuget source
+   ```
+   dotnet nuget add source https://nuget.bepinex.dev/v3/index.json --name bepinex
+   ```
 
 2. Build:
    ```
    dotnet build AIM9XMod/AIM9XMod.csproj -c Release
    ```
 
-3. Copy `AIM9XMod/bin/Release/net472/AIM9XMod.dll` to `BepInEx/plugins/`
+3. Copy `AIM9XMod/bin/Release/net472/AIM9XMod.dll` and the `SeekerNoises` directory to `BepInEx/plugins/`
 
 ## Configuration
 
-After first run, edit `BepInEx/config/com.modder.aim9xmod.cfg`:
+After first run, edit `BepInEx/config/com.modder.aim9xmod.cfg` or use the ingame config edit mod:
 
 | Setting | Default | Description |
 |---------|---------|-------------|
