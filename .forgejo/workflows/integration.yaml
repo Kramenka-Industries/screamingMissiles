@@ -51,7 +51,7 @@ jobs:
         url: https://git.pr0.tech/
         repo: rs/screamingMissiles
         token: ${{ secrets.WRITE_TOKEN }}
-        tag: v1.0.0
+        tag: v1.1.0
         release-dir: release
         release-notes: "HELLO WORLD"
 
