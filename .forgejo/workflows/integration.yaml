@@ -45,7 +45,7 @@ jobs:
       run: cd assembly
 
     - name: Zip files into release
-      run: gzip -r . > ../release/aim9x.zip
+      run: gzip -r . > ../release/aim9x.gz
 
     - name: Release
       uses: actions/forgejo-release@v2.12.0
