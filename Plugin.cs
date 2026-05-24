@@ -41,6 +41,8 @@ namespace AIM9XMod
         public static ConfigEntry<float> LaunchMuteSeconds;
         public static ConfigEntry<bool> ShowDetectionPercentDebug;
         public static ConfigEntry<float> PrelaunchCueAngle;
+        public static ConfigEntry<float> WobbleMaxOffset;
+        public static ConfigEntry<float> WobbleSpeed;
 
         private SeekerCueService _seekerCueService;
 
@@ -103,6 +105,13 @@ namespace AIM9XMod
                 "How long to mute seeker growl after detecting an IR missile launch (seconds).");
             ShowDetectionPercentDebug = Config.Bind("Debug", "ShowDetectionPercentDebug", false,
                 "Show seeker detection percentage text in HUD (debug output).");
+
+            WobbleMaxOffset = Config.Bind("Overlay", "WobbleMaxOffset", 12f,
+                "Maximum pixel displacement of the diamond target indicator when detection is at 0%%. " +
+                "Scales smoothly to zero at 60%% detection. Set to 0 to disable wobble.");
+            WobbleSpeed = Config.Bind("Overlay", "WobbleSpeed", 1f,
+                "Speed multiplier for the diamond indicator wobble oscillation. " +
+                "Higher values produce faster, more erratic movement.");
 
             HarmonyInstance = new Harmony(PluginGUID);
             HarmonyInstance.PatchAll();
