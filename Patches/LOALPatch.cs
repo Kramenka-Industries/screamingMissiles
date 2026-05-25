@@ -483,6 +483,16 @@ namespace AIM9XMod.Patches
                         $"exceeds {offBoresightAngle}° seeker cone. Entering LOAL.");
                 }
             }
+
+            // patch flare rejection factor
+            float flareRejection = Plugin.FlareRejection_IR1.Value;
+            if (missile.name.Equals("AAM3")) {
+                flareRejection = Plugin.FlareRejection_S2.Value;
+            } else if (missile.name.Equals("AAM1")) {
+                flareRejection = Plugin.FlareRejection_MMR.Value;
+            }
+            Plugin.Log.LogInfo($"[LOAL] Flare rejection{t.Field("flareRejection").GetValue<float>()}->{flareRejection}");
+            t.Field("flareRejection").SetValue(flareRejection);
         }
 
         /// <summary>

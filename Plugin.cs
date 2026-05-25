@@ -50,6 +50,9 @@ namespace AIM9XMod
         public static ConfigEntry<float> PrelaunchCueAngle;
         public static ConfigEntry<float> WobbleMaxOffset;
         public static ConfigEntry<float> WobbleSpeed;
+        public static ConfigEntry<float> FlareRejection_IR1;
+        public static ConfigEntry<float> FlareRejection_S2;
+        public static ConfigEntry<float> FlareRejection_MMR;
 
         private SeekerCueService _seekerCueService;
 
@@ -100,6 +103,13 @@ namespace AIM9XMod
                 "Maximum turn rate for IR missile PID. Higher = tighter tracking.");
             MissileMaxTurnRate_MMR = Config.Bind("MMR-S3", "MaxTurnRate", 12f,
                 "Maximum turn rate for IR missile PID (vanilla default ~3). Higher = tighter tracking.");
+
+            FlareRejection_IR1 = Config.Bind("IRM-S1", "Flare rejection factor", 1.75f,
+                "Factor of flares needed to dupe the missile. (1.75f QoL default)");
+            FlareRejection_S2 = Config.Bind("IRM-S2", "Flare rejection factor", 2.0f,
+                "Factor of flares needed to dupe the missile. (2.0f QoL default)");
+            FlareRejection_MMR = Config.Bind("MMR-S3", "Flare rejection factor", 2.5f,
+                "Factor of flares needed to dupe the missile. (2.1f QoL default)");
 
             MissileTorqueMultiplier = Config.Bind("Turning", "TorqueMultiplier", 3f,
                 "Multiplier applied to IR missile torque for enhanced maneuverability");
