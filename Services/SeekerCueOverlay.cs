@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using AIM9XMod.Logic;
 
 namespace AIM9XMod.Services
 {
@@ -109,12 +110,10 @@ namespace AIM9XMod.Services
             // Determine effective detection rate for wobble purposes.
             // When flares are in the detection cone the diamond wobbles even at ≥60% detection,
             // treating the situation as if detection was at a moderate sub-60% level (0.3f).
-            float effectiveRate = (_flareInCone && _detectionRate >= 0.6f)
-                ? 0.3f
-                : _detectionRate;
+            float effectiveRate = SeekerCueMath.ComputeEffectiveWobbleDetectionRate(_detectionRate, _flareInCone);
 
             // wobbleFactor is 0 at ≥60% detection and increases toward 1 as detection drops to 0%.
-            float wobbleFactor = Mathf.InverseLerp(0.6f, 0f, effectiveRate);
+            float wobbleFactor = SeekerCueMath.ComputeWobbleFactor(effectiveRate);
             if (wobbleFactor <= 0f)
                 return Vector2.zero;
 

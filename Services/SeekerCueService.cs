@@ -4,6 +4,7 @@ using System.IO;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.Networking;
+using AIM9XMod.Logic;
 
 namespace AIM9XMod.Services
 {
@@ -328,20 +329,15 @@ namespace AIM9XMod.Services
             {
                 if (targetSlavedMode)
                 {
-                    float heatRate = Mathf.Clamp01(cue.heat / 8f);
                     float maxRangeForDetection = 12000f;
                     if (ws != null && ws.WeaponInfo != null)
                         maxRangeForDetection = ws.WeaponInfo.targetRequirements.maxRange;
-
-                    float distanceRate = Mathf.InverseLerp(maxRangeForDetection, 250f, cue.distance);
-                    detectionRate = Mathf.Clamp01(heatRate * 0.65f + distanceRate * 0.35f);
+                    detectionRate = SeekerCueMath.ComputeTargetSlavedDetectionRate(cue.heat, cue.distance, maxRangeForDetection);
                 }
                 else
                 {
-                    float cueCone = Mathf.Max(1f, Plugin.PrelaunchCueAngle.Value);
-                    float angleRate = Mathf.InverseLerp(cueCone, 0f, cue.angleDeg);
-                    float heatRate = Mathf.Clamp01(cue.heat / 8f);
-                    detectionRate = Mathf.Clamp01(angleRate * 0.7f + heatRate * 0.3f);
+                    float cueCone = Plugin.PrelaunchCueAngle.Value;
+                    detectionRate = SeekerCueMath.ComputeSearchDetectionRate(cue.angleDeg, cue.heat, cueCone);
                 }
             }
             bool highDetection = detectionRate >= 0.6f;
@@ -383,7 +379,7 @@ namespace AIM9XMod.Services
             float masterVolume = _configuredGrowlVolume;
 
             // Thresholded blend: <=30% pure caged, >=60% pure uncaged.
-            float uncagedMix = Mathf.InverseLerp(0.3f, 0.6f, detectionRate);
+            float uncagedMix = SeekerCueMath.ComputeUncagedMix(detectionRate);
             float cagedMix = 1f - uncagedMix;
 
             if (_standbySource != null)
@@ -1230,11 +1226,7 @@ namespace AIM9XMod.Services
 
         private static float ComputeCueStrength(CueTargetInfo cue)
         {
-            float angleFactor = Mathf.InverseLerp(20f, 0f, cue.angleDeg);
-            float heatFactor = Mathf.Clamp01(cue.heat / 12f);
-            float distanceFactor = Mathf.InverseLerp(12000f, 250f, cue.distance);
-
-            return Mathf.Clamp01(angleFactor * 0.5f + heatFactor * 0.35f + distanceFactor * 0.15f);
+            return SeekerCueMath.ComputeCueStrength(cue.angleDeg, cue.heat, cue.distance);
         }
 
         private static int CountActiveLaunchedIrMissiles(Aircraft ownAircraft)
