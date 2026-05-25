@@ -53,6 +53,15 @@ namespace AIM9XMod
         public static ConfigEntry<float> FlareRejection_IR1;
         public static ConfigEntry<float> FlareRejection_S2;
         public static ConfigEntry<float> FlareRejection_MMR;
+        public static ConfigEntry<float> Thrust_IR1;
+        public static ConfigEntry<float> Thrust_S2;
+        public static ConfigEntry<float> Thrust_MMR;
+        public static ConfigEntry<float> Burn_IR1;
+        public static ConfigEntry<float> Burn_S2;
+        public static ConfigEntry<float> Burn_MMR;
+        public static ConfigEntry<float> Fuel_IR1;
+        public static ConfigEntry<float> Fuel_S2;
+        public static ConfigEntry<float> Fuel_MMR;
 
         private SeekerCueService _seekerCueService;
 
@@ -108,7 +117,7 @@ namespace AIM9XMod
                 "Factor of flares needed to dupe the missile. (1.75f QoL default)");
             FlareRejection_S2 = Config.Bind("IRM-S2", "Flare rejection factor", 2.0f,
                 "Factor of flares needed to dupe the missile. (2.0f QoL default)");
-            FlareRejection_MMR = Config.Bind("MMR-S3", "Flare rejection factor", 2.5f,
+            FlareRejection_MMR = Config.Bind("MMR-S3", "Flare rejection factor", 3.0f,
                 "Factor of flares needed to dupe the missile. (2.1f QoL default)");
 
             MissileTorqueMultiplier = Config.Bind("Turning", "TorqueMultiplier", 3f,
@@ -150,6 +159,27 @@ namespace AIM9XMod
             WobbleSpeed = Config.Bind("Overlay", "WobbleSpeed", 1.3f,
                 "Speed multiplier for the diamond indicator wobble oscillation. " +
                 "Higher values produce faster, more erratic movement.");
+
+            Thrust_IR1 = Config.Bind("IRM-S1", "Motor thrust", 2750.0f,
+                "Motor thrust in N. (2750.0f QoL default)");
+            Thrust_S2 = Config.Bind("IRM-S2", "Motor thrust", 18000.0f,
+                "Motor thrust in N. (18000.0f QoL default)");
+            Thrust_MMR = Config.Bind("MMR-S3", "Motor thrust", 40000.0f,
+                "Motor thrust in N. (28000.0f QoL default)");
+
+            Burn_IR1 = Config.Bind("IRM-S1", "Motor burn time", 2.0f,
+                "Motor burn time in seconds. (2.0f QoL default)");
+            Burn_S2 = Config.Bind("IRM-S2", "Motor burn time", 2.0f,
+                "Motor burn time in seconds. (2.0f QoL default)");
+            Burn_MMR = Config.Bind("MMR-S3", "Motor burn time", 2.2f,
+                "Motor burn time in seconds. (2.2f QoL default)");
+
+            Fuel_IR1 = Config.Bind("IRM-S1", "Fuel mass", 4.0f,
+                "Fuel mass in kg. (4.0f QoL default)");
+            Fuel_S2 = Config.Bind("IRM-S2", "Fuel mass", 25.0f,
+                "Fuel mass in kg. (25.0f QoL default)");
+            Fuel_MMR = Config.Bind("MMR-S3", "Fuel mass", 40.0f,
+                "Fuel mass in kg. (40.0f QoL default)");
 
             HarmonyInstance = new Harmony(PluginGUID);
             HarmonyInstance.PatchAll();
