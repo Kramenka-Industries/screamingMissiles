@@ -154,7 +154,7 @@ namespace AIM9XMod.Services
                 hasRadarHardLock = TryGetRadarHardLockState(ownAircraft, ws);
                 if (TryGetActiveSelectedTarget(ownAircraft, ws, out selectedTarget))
                 {
-                    if (IsWithinAircraftForwardCone(ownAircraft, selectedTarget))
+                    if (IsWithinAircraftForwardCone(ownAircraft, selectedTarget, ws))
                     {
                         targetSlavedMode = true;
                         selectedTargetName = selectedTarget != null ? selectedTarget.unitName : "null";
@@ -238,10 +238,19 @@ namespace AIM9XMod.Services
                 return;
             }
 
+            string weaponName = weaponInfo.name;
+
             float maxRange = weaponInfo.targetRequirements.maxRange;
             float cueAngle = Mathf.Max(1f, Plugin.PrelaunchCueAngle.Value);
-            float offBoresightAngle = Mathf.Max(1f, Plugin.OffBoresightAngle.Value);
             var ownHq = ownAircraft != null ? ownAircraft.NetworkHQ : null;
+
+            float offBoresightAngle = Plugin.OffBoresightAngle_IR1.Value;
+            if (weaponName.Equals("AAM3")) {
+                offBoresightAngle = Plugin.OffBoresightAngle_S2.Value;
+            } else if (weaponName.Equals("AAM1")) {
+                offBoresightAngle = Plugin.OffBoresightAngle_MMR.Value;
+            }
+            offBoresightAngle = Mathf.Max(1f, offBoresightAngle);
 
             Unit bestUnit = null;
             float bestScore = float.MaxValue;
@@ -296,7 +305,7 @@ namespace AIM9XMod.Services
 
         private void UpdateGrowlFromCue(bool irMissileSelected, Aircraft ownAircraft, WeaponStation ws, Vector3 viewDir, bool targetSlavedMode, bool hasRadarHardLock, List<Unit> assignmentTargets)
         {
-            bool viewCenterInCone = IsViewCenterWithinAircraftForwardCone(ownAircraft, viewDir);
+            bool viewCenterInCone = IsViewCenterWithinAircraftForwardCone(ownAircraft, viewDir, ws);
 
             // When radar lock is active but the target has left the offboresight angle area,
             // hide the manual view lock circles so they don't mislead the pilot.
@@ -424,15 +433,25 @@ namespace AIM9XMod.Services
                 _overlay.SetCueVisible(true, hasCue ? cue.target : null, Mathf.Max(0.2f, cueStrength), detectionRate, searchMode, targetSlavedMode, viewCenterInCone, flareInCone, assignmentTargets);
         }
 
-        private static bool IsViewCenterWithinAircraftForwardCone(Aircraft ownAircraft, Vector3 viewDir)
+        private static bool IsViewCenterWithinAircraftForwardCone(Aircraft ownAircraft, Vector3 viewDir, WeaponStation ws)
         {
             if (ownAircraft == null)
-                return true;
+                return false;
 
             if (viewDir.sqrMagnitude <= 0.0001f)
-                return true;
+                return false;
 
-            float offBoresightAngle = Mathf.Max(1f, Plugin.OffBoresightAngle.Value);
+            if (ws == null || ws.WeaponInfo == null)
+                return false;
+
+            float offBoresightAngle = Plugin.OffBoresightAngle_IR1.Value;
+            if (ws.WeaponInfo.name.Equals("AAM3")) {
+                offBoresightAngle = Plugin.OffBoresightAngle_S2.Value;
+            } else if (ws.WeaponInfo.name.Equals("AAM1")) {
+                offBoresightAngle = Plugin.OffBoresightAngle_MMR.Value;
+            }
+            offBoresightAngle = Mathf.Max(1f, offBoresightAngle);
+
             return Vector3.Angle(ownAircraft.transform.forward, viewDir.normalized) <= offBoresightAngle;
         }
 
@@ -474,7 +493,13 @@ namespace AIM9XMod.Services
             if (maxAssignable <= 0)
                 return null;
 
-            float offBoresightAngle = Mathf.Max(1f, Plugin.OffBoresightAngle.Value);
+            float offBoresightAngle = Plugin.OffBoresightAngle_IR1.Value;
+            if (ws.WeaponInfo.name.Equals("AAM3")) {
+                offBoresightAngle = Plugin.OffBoresightAngle_S2.Value;
+            } else if (ws.WeaponInfo.name.Equals("AAM1")) {
+                offBoresightAngle = Plugin.OffBoresightAngle_MMR.Value;
+            }
+            offBoresightAngle = Mathf.Max(1f, offBoresightAngle);
             Vector3 ownPosition = ownAircraft.transform.position;
             Vector3 ownForward = ownAircraft.transform.forward;
 
@@ -627,7 +652,7 @@ namespace AIM9XMod.Services
             return unit.HasIRSignature();
         }
 
-        private static bool IsWithinAircraftForwardCone(Aircraft ownAircraft, Unit target)
+        private static bool IsWithinAircraftForwardCone(Aircraft ownAircraft, Unit target, WeaponStation ws)
         {
             if (ownAircraft == null || target == null)
                 return false;
@@ -636,7 +661,16 @@ namespace AIM9XMod.Services
             if (toTarget.sqrMagnitude <= 1f)
                 return true;
 
-            float offBoresightAngle = Mathf.Max(1f, Plugin.OffBoresightAngle.Value);
+            if (ws == null || ws.WeaponInfo == null)
+                return false;
+
+            float offBoresightAngle = Plugin.OffBoresightAngle_IR1.Value;
+            if (ws.WeaponInfo.name.Equals("AAM3")) {
+                offBoresightAngle = Plugin.OffBoresightAngle_S2.Value;
+            } else if (ws.WeaponInfo.name.Equals("AAM1")) {
+                offBoresightAngle = Plugin.OffBoresightAngle_MMR.Value;
+            }
+            offBoresightAngle = Mathf.Max(1f, offBoresightAngle);
             return Vector3.Angle(ownAircraft.transform.forward, toTarget) <= offBoresightAngle;
         }
 

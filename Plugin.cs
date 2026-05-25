@@ -19,9 +19,15 @@ namespace AIM9XMod
         internal static Plugin Instance;
 
         // Config entries
-        public static ConfigEntry<float> OffBoresightAngle;
-        public static ConfigEntry<float> FiringGateAngle;
-        public static ConfigEntry<float> MissileMaxTurnRate;
+        public static ConfigEntry<float> OffBoresightAngle_IR1;
+        public static ConfigEntry<float> OffBoresightAngle_S2;
+        public static ConfigEntry<float> OffBoresightAngle_MMR;
+        public static ConfigEntry<float> FiringGateAngle_IR1;
+        public static ConfigEntry<float> FiringGateAngle_S2;
+        public static ConfigEntry<float> FiringGateAngle_MMR;
+        public static ConfigEntry<float> MissileMaxTurnRate_IR1;
+        public static ConfigEntry<float> MissileMaxTurnRate_S2;
+        public static ConfigEntry<float> MissileMaxTurnRate_MMR;
         public static ConfigEntry<float> MissileTorqueMultiplier;
         public static ConfigEntry<float> LOALSearchAngle;
         public static ConfigEntry<float> LOALSearchTime;
@@ -68,15 +74,33 @@ namespace AIM9XMod
             EnableSeekerGrowl = Config.Bind("Features", "EnableSeekerGrowl", true,
                 "Enable pre-launch seeker cueing overlay and growl tone feedback.");
 
-            OffBoresightAngle = Config.Bind("Boresight", "OffBoresightAngle", 90f,
+            OffBoresightAngle_IR1 = Config.Bind("IRM-S1", "OffBoresightAngle", 50f,
                 "Maximum off-boresight seeker angle in degrees (AIM-9X: 90°). " +
                 "The firing gate allows 180° but launches beyond this angle go out in LOAL mode.");
-            FiringGateAngle = Config.Bind("Boresight", "FiringGateAngle", 180f,
+            OffBoresightAngle_S2 = Config.Bind("IRM-S2", "OffBoresightAngle", 70f,
+                "Maximum off-boresight seeker angle in degrees (AIM-9X: 90°). " +
+                "The firing gate allows 180° but launches beyond this angle go out in LOAL mode.");
+            OffBoresightAngle_MMR = Config.Bind("MMR-S3", "OffBoresightAngle", 90f,
+                "Maximum off-boresight seeker angle in degrees (AIM-9X: 90°). " +
+                "The firing gate allows 180° but launches beyond this angle go out in LOAL mode.");
+
+            FiringGateAngle_IR1 = Config.Bind("IRM-S1", "FiringGateAngle", 70f,
+                "Maximum angle at which IR missiles can be launched. Targets beyond OffBoresightAngle " +
+                "but within this angle launch the missile in LOAL (no-lock) mode.");
+            FiringGateAngle_S2 = Config.Bind("IRM-S2", "FiringGateAngle", 100f,
+                "Maximum angle at which IR missiles can be launched. Targets beyond OffBoresightAngle " +
+                "but within this angle launch the missile in LOAL (no-lock) mode.");
+            FiringGateAngle_MMR = Config.Bind("MMR-S3", "FiringGateAngle", 180f,
                 "Maximum angle at which IR missiles can be launched. Targets beyond OffBoresightAngle " +
                 "but within this angle launch the missile in LOAL (no-lock) mode.");
 
-            MissileMaxTurnRate = Config.Bind("Turning", "MaxTurnRate", 12f,
+            MissileMaxTurnRate_IR1 = Config.Bind("IRM-S1", "MaxTurnRate", 6f,
+                "Maximum turn rate for IR missile PID. Higher = tighter tracking.");
+            MissileMaxTurnRate_S2 = Config.Bind("IRM-S2", "MaxTurnRate", 9f,
+                "Maximum turn rate for IR missile PID. Higher = tighter tracking.");
+            MissileMaxTurnRate_MMR = Config.Bind("MMR-S3", "MaxTurnRate", 12f,
                 "Maximum turn rate for IR missile PID (vanilla default ~3). Higher = tighter tracking.");
+
             MissileTorqueMultiplier = Config.Bind("Turning", "TorqueMultiplier", 3f,
                 "Multiplier applied to IR missile torque for enhanced maneuverability");
 

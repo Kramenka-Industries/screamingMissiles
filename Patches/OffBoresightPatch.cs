@@ -30,7 +30,13 @@ namespace AIM9XMod.Patches
             var field = AccessTools.Field(typeof(HUDMissileState), "minAlignment");
             if (field != null)
             {
-                field.SetValue(__instance, Plugin.FiringGateAngle.Value);
+                float firingAngle = Plugin.FiringGateAngle_IR1.Value;
+                if (__instance.name.Equals("AAM3")) {
+                    firingAngle = Plugin.FiringGateAngle_S2.Value;
+                } else if (__instance.name.Equals("AAM1")) {
+                    firingAngle = Plugin.FiringGateAngle_MMR.Value;
+                }
+                field.SetValue(__instance, firingAngle);
             }
         }
 
@@ -56,10 +62,17 @@ namespace AIM9XMod.Patches
             var info = weaponStation.WeaponInfo;
             if (info == null || info.targetRequirements.minIR <= 0f) return;
 
+            float offAngle = Plugin.OffBoresightAngle_IR1.Value;
+            if (weaponStation.WeaponInfo.name.Equals("AAM3")) {
+                offAngle = Plugin.OffBoresightAngle_S2.Value;
+            } else if (weaponStation.WeaponInfo.name.Equals("AAM1")) {
+                offAngle = Plugin.OffBoresightAngle_MMR.Value;
+            }
+
             var reqs = info.targetRequirements;
-            if (reqs.minAlignment < Plugin.OffBoresightAngle.Value)
+            if (reqs.minAlignment < offAngle)
             {
-                reqs.minAlignment = Plugin.OffBoresightAngle.Value;
+                reqs.minAlignment = offAngle;
                 info.targetRequirements = reqs;
             }
         }
