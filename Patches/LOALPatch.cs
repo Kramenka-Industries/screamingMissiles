@@ -185,7 +185,13 @@ namespace AIM9XMod.Patches
 
             Vector3 ownerForward = missile.owner.transform.forward;
             Vector3 ownerPosition = missile.owner.transform.position;
-            float offBoresightAngle = Mathf.Max(1f, Plugin.OffBoresightAngle.Value);
+            float offBoresightAngle = Plugin.OffBoresightAngle_IR1.Value;
+            if (missile.name.Equals("AAM3")) {
+                offBoresightAngle = Plugin.OffBoresightAngle_S2.Value;
+            } else if (missile.name.Equals("AAM1")) {
+                offBoresightAngle = Plugin.OffBoresightAngle_MMR.Value;
+            }
+            offBoresightAngle = Mathf.Max(1f, offBoresightAngle);
 
             Vector3 toTarget = candidateTarget.transform.position - ownerPosition;
             float angle = Vector3.Angle(ownerForward, toTarget);
@@ -211,7 +217,15 @@ namespace AIM9XMod.Patches
                 return false;
 
             var validTargets = new List<Unit>(hudTargets.Count);
-            float offBoresightAngle = Mathf.Max(1f, Plugin.OffBoresightAngle.Value);
+
+            float offBoresightAngle = Plugin.OffBoresightAngle_IR1.Value;
+            if (missile.name.Equals("AAM3")) {
+                offBoresightAngle = Plugin.OffBoresightAngle_S2.Value;
+            } else if (missile.name.Equals("AAM1")) {
+                offBoresightAngle = Plugin.OffBoresightAngle_MMR.Value;
+            }
+            offBoresightAngle = Mathf.Max(1f, offBoresightAngle);
+
             Vector3 ownerForward = missile.owner.transform.forward;
             Vector3 ownerPosition = missile.owner.transform.position;
 
@@ -448,7 +462,16 @@ namespace AIM9XMod.Patches
             {
                 Vector3 toTarget = targetUnit.transform.position - missile.transform.position;
                 float angle = Vector3.Angle(missile.transform.forward, toTarget);
-                if (angle > Plugin.OffBoresightAngle.Value)
+
+                float offBoresightAngle = Plugin.OffBoresightAngle_IR1.Value;
+                if (missile.name.Equals("AAM3")) {
+                    offBoresightAngle = Plugin.OffBoresightAngle_S2.Value;
+                } else if (missile.name.Equals("AAM1")) {
+                    offBoresightAngle = Plugin.OffBoresightAngle_MMR.Value;
+                }
+                offBoresightAngle = Mathf.Max(1f, offBoresightAngle);
+
+                if (angle > offBoresightAngle)
                 {
                     // Target is outside seeker cone — force LOAL mode
                     t.Field("IRTarget").SetValue(null);
@@ -457,7 +480,7 @@ namespace AIM9XMod.Patches
 
                     Plugin.Log.LogDebug(
                         $"[LOAL] Rear-hemisphere launch: target at {angle:F0}° off-bore, " +
-                        $"exceeds {Plugin.OffBoresightAngle.Value}° seeker cone. Entering LOAL.");
+                        $"exceeds {offBoresightAngle}° seeker cone. Entering LOAL.");
                 }
             }
         }

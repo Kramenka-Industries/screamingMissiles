@@ -38,13 +38,23 @@ namespace AIM9XMod.Patches
             // Apply enhanced values — use config value directly since GetMaxTurnRate()
             // now returns hardcoded 90f and no longer reflects the actual PID pLimit.
             // The new PID2D initializes with pLimit=1.0, so we always override to our configured value.
-            float newTurnRate = Plugin.MissileMaxTurnRate.Value;
+            float newTurnRate = Plugin.MissileMaxTurnRate_IR1.Value;
+            if (__instance.name.Equals("AAM3")) {
+                newTurnRate = Plugin.MissileMaxTurnRate_S2.Value;
+            } else if (__instance.name.Equals("AAM1")) {
+                newTurnRate = Plugin.MissileMaxTurnRate_MMR.Value;
+            }
+
             float newTorque = origTorque * Plugin.MissileTorqueMultiplier.Value;
+
+            // AAM3 -> IRM-S2
+            // AAM1 -> MMR-S3
+            // SAM_IR1 -> IRM-S1
 
             // SetTorque updates torqueAxes and calls pid.SetPLimit(maxTurnRate) when LocalSim is true
             __instance.SetTorque(newTorque, newTurnRate);
 
-            Plugin.Log.LogDebug($"[TVC] Enhanced IR missile turning: turnRate -> {newTurnRate}, torque {origTorque} -> {newTorque}");
+            Plugin.Log.LogDebug($"[TVC] {__instance.name} Enhanced IR missile turning: turnRate -> {newTurnRate}, torque {origTorque} -> {newTorque}");
         }
     }
 }
