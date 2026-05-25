@@ -23,6 +23,14 @@ Adds AIM-9X-style behavior to all IR-seeking missiles in Nuclear Option:
 
 3. Copy `AIM9XMod/bin/Release/net472/AIM9XMod.dll` and the `SeekerNoises` directory to `BepInEx/plugins/`
 
+## Unit Tests
+
+Run unit tests for extracted seeker math logic:
+
+```
+dotnet test AIM9XMod.Tests/AIM9XMod.Tests.csproj -c Release
+```
+
 ## Installation
 
 1. Build the mod.

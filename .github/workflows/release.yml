@@ -29,6 +29,9 @@ jobs:
       - name: Build
         run: dotnet build --configuration Release --no-restore
 
+      - name: Run unit tests
+        run: dotnet test AIM9XMod.Tests/AIM9XMod.Tests.csproj --configuration Release
+
       - name: Create assembly directory
         run: mkdir assembly
 

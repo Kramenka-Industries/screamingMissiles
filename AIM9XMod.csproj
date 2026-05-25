@@ -17,4 +17,9 @@
     <PackageReference Include="stafelstr.nonuget" Version="1.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="AIM9XMod.Tests/**/*.cs" />
+    <None Include="AIM9XMod.Tests/**/*.cs" />
+  </ItemGroup>
+
 </Project>
