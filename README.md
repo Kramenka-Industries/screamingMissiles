@@ -1,6 +1,6 @@
 # ScreamingMissiles — Nuclear Option BepInEx Mod
 
-![ScreamingMissiles hero](https://github.com/user-attachments/assets/98ee4a19-6573-4bfd-b3c9-90f720be4e1f)
+![ScreamingMissiles hero](./readme/screamingmissile.png)
 
 ScreamingMissiles overhauls IR missile behavior in Nuclear Option with wider launch envelopes, LOAL search/reacquire logic, stronger turn authority, seeker cue overlays, and configurable seeker audio.
 
