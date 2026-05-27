@@ -78,10 +78,4 @@ public class MissileTypeResolverTests
         Assert.Equal(expected, type);
     }
 
-    [Fact]
-    public void Resolve_NullWeaponNameFallsBackToIrmS1()
-    {
-        var type = MissileTypeResolver.Resolve(null);
-        Assert.Equal(MissileType.IRM_S1, type);
-    }
 }

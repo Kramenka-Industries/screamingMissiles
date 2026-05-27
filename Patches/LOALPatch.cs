@@ -767,7 +767,10 @@ namespace AIM9XMod.Patches
 
             var t = Traverse.Create(__instance);
             var missile = t.Field("missile").GetValue<Missile>();
-            if (missile == null || !Plugin.IsLoalEnabledForMissile(missile.name))
+            if (missile == null)
+                return;
+
+            if (!Plugin.IsLoalEnabledForMissile(missile.name))
                 return;
 
             var targetUnit = t.Field("targetUnit").GetValue<Unit>();
