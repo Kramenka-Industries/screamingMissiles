@@ -12,17 +12,11 @@ ScreamingMissiles overhauls IR missile behavior in Nuclear Option with wider lau
 
 ## Building
 
-1. Add the bepinex nuget source
-   ```
-   dotnet nuget add source https://nuget.bepinex.dev/v3/index.json --name bepinex
-   ```
+```
+dotnet build AIM9XMod.csproj -c Release
+```
 
-2. Build:
-   ```
-   dotnet build AIM9XMod.csproj -c Release
-   ```
-
-3. Copy `bin/Release/net472/ScreamingMissiles.dll` and the `SeekerNoises` directory to `BepInEx/plugins/`
+Copy `bin/Release/net472/ScreamingMissiles.dll` and the `SeekerNoises` directory to `BepInEx/plugins/`
 
 ## Unit Tests
 
