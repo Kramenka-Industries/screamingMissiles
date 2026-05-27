@@ -12,7 +12,7 @@ namespace AIM9XMod
     public class Plugin : BaseUnityPlugin
     {
         public const string PluginGUID = "com.modder.aim9xmod";
-        public const string PluginName = "AIM-9X IR Missile Overhaul";
+        public const string PluginName = "ScreamingMissiles";
         public const string PluginVersion = "0.7.0";
 
         internal static ManualLogSource Log;
@@ -190,7 +190,7 @@ namespace AIM9XMod
 
             _seekerCueService = gameObject.AddComponent<SeekerCueService>();
 
-            Log.LogInfo($"AIM-9X IR Missile Overhaul v{PluginVersion} loaded!");
+            Log.LogInfo($"ScreamingMissiles v{PluginVersion} loaded!");
         }
 
         private void OnDestroy()
