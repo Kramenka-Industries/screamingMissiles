@@ -36,7 +36,7 @@ jobs:
         run: mkdir assembly
 
       - name: Copy DLL to assembly
-        run: cp bin/Release/net472/AIM9XMod.dll assembly/AIM9XMod.dll
+        run: cp bin/Release/net472/ScreamingMissiles.dll assembly/ScreamingMissiles.dll
 
       - name: Copy sounds to assembly
         run: cp -R SeekerNoises assembly/
@@ -45,10 +45,10 @@ jobs:
         run: mkdir release
 
       - name: Compress files into release
-        run: cd assembly && tar -czvf ../release/aim9x.tar.gz ./
+        run: cd assembly && tar -czvf ../release/screamingmissiles.tar.gz ./
 
       - name: Publish GitHub release
         uses: softprops/action-gh-release@v2
         with:
-          files: release/aim9x.tar.gz
+          files: release/screamingmissiles.tar.gz
           generate_release_notes: true

@@ -48,7 +48,7 @@ jobs:
     - name: Create assembly directory
       run: mkdir assembly
     - name: Copy dll to assembly
-      run: cp bin/Debug/net472/AIM9XMod.dll assembly/AIM9XMod.dll
+      run: cp bin/Debug/net472/ScreamingMissiles.dll assembly/ScreamingMissiles.dll
     - name: Copy sounds to assembly
       run: cp -R SeekerNoises assembly/
     
@@ -56,7 +56,7 @@ jobs:
       run: mkdir release
 
     - name: Compress files into release
-      run: cd assembly && tar -czvf ../release/aim9x.tar.gz ./
+      run: cd assembly && tar -czvf ../release/screamingmissiles.tar.gz ./
 
     - name: Release
       uses: actions/forgejo-release@v2.12.0
@@ -69,4 +69,3 @@ jobs:
         release-dir: release
         release-notes: ${{ inputs.releaseNotes }}
         prerelease: ${{ inputs.isPrerelease }}
-
