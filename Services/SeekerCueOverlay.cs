@@ -114,12 +114,12 @@ namespace AIM9XMod.Services
 
         private void DrawOffBoresightDebug(float cx, float cy, float lockRadius)
         {
-            float viewed = _viewedOffBoresightAngleDeg;
-            float selected = _selectedMissileOffBoresightAngleDeg;
+            float viewedAngle = _viewedOffBoresightAngleDeg;
+            float selectedAngle = _selectedMissileOffBoresightAngleDeg;
             string status = _viewCenterInCone ? "IN-CONE" : "OUT-OF-CONE";
 
             GUI.Label(new Rect(cx - 220f, cy + lockRadius + 44f, 440f, 24f),
-                "OBS VIEW: " + viewed.ToString("F1") + "°  MISSILE: " + selected.ToString("F1") + "°  " + status, _style);
+                "OBS VIEW: " + viewedAngle.ToString("F1") + "°  MISSILE: " + selectedAngle.ToString("F1") + "°  " + status, _style);
 
             float gaugeWidth = 320f;
             float gaugeHeight = 10f;
@@ -128,7 +128,7 @@ namespace AIM9XMod.Services
 
             DrawRect(new Rect(gx, gy, gaugeWidth, gaugeHeight), new Color(0.08f, 1f, 0.08f, 0.18f));
 
-            float normalized = selected > 0.001f ? Mathf.Clamp01(viewed / selected) : 0f;
+            float normalized = selectedAngle > 0.001f ? Mathf.Clamp01(viewedAngle / selectedAngle) : 0f;
             Color marker = _viewCenterInCone ? new Color(0.08f, 1f, 0.08f, 0.92f) : new Color(1f, 0.26f, 0.08f, 0.92f);
             DrawRect(new Rect(gx, gy, gaugeWidth * normalized, gaugeHeight), marker);
         }
