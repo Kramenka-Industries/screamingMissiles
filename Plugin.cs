@@ -4,6 +4,7 @@ using BepInEx.Logging;
 using HarmonyLib;
 using UnityEngine;
 using AIM9XMod.Services;
+using AIM9XMod.Logic;
 
 namespace AIM9XMod
 {
@@ -75,8 +76,8 @@ namespace AIM9XMod
                 "Enable 90° off-boresight launch capability for IR missiles");
             EnableEnhancedTurning = Config.Bind("Features", "EnableEnhancedTurning", true,
                 "Enable AIM-9X-class turning performance for IR missiles");
-            EnableLOAL = Config.Bind("Features", "EnableLOAL", true,
-                "Enable Lock-On After Launch for IR missiles");
+            EnableLOAL = Config.Bind("MMR-S3", "EnableLOAL", true,
+                "Enable Lock-On After Launch for MMR-S3 missiles only.");
             UsePeakIRThreshold = Config.Bind("Features", "UsePeakIRThreshold", false,
                 "When true, flare evasion threshold uses the highest IR the missile ever observed while tracking. " +
                 "When false (default), uses the aircraft's IR output at the moment of flare evasion.");
@@ -199,6 +200,37 @@ namespace AIM9XMod
 
             HarmonyInstance?.UnpatchSelf();
             Instance = null;
+        }
+
+        public static float GetOffBoresightAngle(string weaponName)
+        {
+            switch (MissileTypeResolver.Resolve(weaponName))
+            {
+                case MissileType.IRM_S2:
+                    return OffBoresightAngle_S2.Value;
+                case MissileType.MMR_S3:
+                    return OffBoresightAngle_MMR.Value;
+                default:
+                    return OffBoresightAngle_IR1.Value;
+            }
+        }
+
+        public static float GetFiringGateAngle(string weaponName)
+        {
+            switch (MissileTypeResolver.Resolve(weaponName))
+            {
+                case MissileType.IRM_S2:
+                    return FiringGateAngle_S2.Value;
+                case MissileType.MMR_S3:
+                    return FiringGateAngle_MMR.Value;
+                default:
+                    return FiringGateAngle_IR1.Value;
+            }
+        }
+
+        public static bool IsLoalEnabledForMissile(string weaponName)
+        {
+            return EnableLOAL.Value && MissileTypeResolver.Resolve(weaponName) == MissileType.MMR_S3;
         }
     }
 }

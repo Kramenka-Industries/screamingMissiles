@@ -238,18 +238,11 @@ namespace AIM9XMod.Services
                 return;
             }
 
-            string weaponName = weaponInfo.name;
-
             float maxRange = weaponInfo.targetRequirements.maxRange;
             float cueAngle = Mathf.Max(1f, Plugin.PrelaunchCueAngle.Value);
             var ownHq = ownAircraft != null ? ownAircraft.NetworkHQ : null;
 
-            float offBoresightAngle = Plugin.OffBoresightAngle_IR1.Value;
-            if (weaponName.Equals("AAM3")) {
-                offBoresightAngle = Plugin.OffBoresightAngle_S2.Value;
-            } else if (weaponName.Equals("AAM1")) {
-                offBoresightAngle = Plugin.OffBoresightAngle_MMR.Value;
-            }
+            float offBoresightAngle = Plugin.GetOffBoresightAngle(weaponInfo.name);
             offBoresightAngle = Mathf.Max(1f, offBoresightAngle);
 
             Unit bestUnit = null;
@@ -444,12 +437,7 @@ namespace AIM9XMod.Services
             if (ws == null || ws.WeaponInfo == null)
                 return false;
 
-            float offBoresightAngle = Plugin.OffBoresightAngle_IR1.Value;
-            if (ws.WeaponInfo.name.Equals("AAM3")) {
-                offBoresightAngle = Plugin.OffBoresightAngle_S2.Value;
-            } else if (ws.WeaponInfo.name.Equals("AAM1")) {
-                offBoresightAngle = Plugin.OffBoresightAngle_MMR.Value;
-            }
+            float offBoresightAngle = Plugin.GetOffBoresightAngle(ws.WeaponInfo.name);
             offBoresightAngle = Mathf.Max(1f, offBoresightAngle);
 
             return Vector3.Angle(ownAircraft.transform.forward, viewDir.normalized) <= offBoresightAngle;
@@ -493,12 +481,7 @@ namespace AIM9XMod.Services
             if (maxAssignable <= 0)
                 return null;
 
-            float offBoresightAngle = Plugin.OffBoresightAngle_IR1.Value;
-            if (ws.WeaponInfo.name.Equals("AAM3")) {
-                offBoresightAngle = Plugin.OffBoresightAngle_S2.Value;
-            } else if (ws.WeaponInfo.name.Equals("AAM1")) {
-                offBoresightAngle = Plugin.OffBoresightAngle_MMR.Value;
-            }
+            float offBoresightAngle = Plugin.GetOffBoresightAngle(ws.WeaponInfo.name);
             offBoresightAngle = Mathf.Max(1f, offBoresightAngle);
             Vector3 ownPosition = ownAircraft.transform.position;
             Vector3 ownForward = ownAircraft.transform.forward;
@@ -664,12 +647,7 @@ namespace AIM9XMod.Services
             if (ws == null || ws.WeaponInfo == null)
                 return false;
 
-            float offBoresightAngle = Plugin.OffBoresightAngle_IR1.Value;
-            if (ws.WeaponInfo.name.Equals("AAM3")) {
-                offBoresightAngle = Plugin.OffBoresightAngle_S2.Value;
-            } else if (ws.WeaponInfo.name.Equals("AAM1")) {
-                offBoresightAngle = Plugin.OffBoresightAngle_MMR.Value;
-            }
+            float offBoresightAngle = Plugin.GetOffBoresightAngle(ws.WeaponInfo.name);
             offBoresightAngle = Mathf.Max(1f, offBoresightAngle);
             return Vector3.Angle(ownAircraft.transform.forward, toTarget) <= offBoresightAngle;
         }

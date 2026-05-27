@@ -185,12 +185,7 @@ namespace AIM9XMod.Patches
 
             Vector3 ownerForward = missile.owner.transform.forward;
             Vector3 ownerPosition = missile.owner.transform.position;
-            float offBoresightAngle = Plugin.OffBoresightAngle_IR1.Value;
-            if (missile.name.Equals("AAM3")) {
-                offBoresightAngle = Plugin.OffBoresightAngle_S2.Value;
-            } else if (missile.name.Equals("AAM1")) {
-                offBoresightAngle = Plugin.OffBoresightAngle_MMR.Value;
-            }
+            float offBoresightAngle = Plugin.GetOffBoresightAngle(missile.name);
             offBoresightAngle = Mathf.Max(1f, offBoresightAngle);
 
             Vector3 toTarget = candidateTarget.transform.position - ownerPosition;
@@ -218,12 +213,7 @@ namespace AIM9XMod.Patches
 
             var validTargets = new List<Unit>(hudTargets.Count);
 
-            float offBoresightAngle = Plugin.OffBoresightAngle_IR1.Value;
-            if (missile.name.Equals("AAM3")) {
-                offBoresightAngle = Plugin.OffBoresightAngle_S2.Value;
-            } else if (missile.name.Equals("AAM1")) {
-                offBoresightAngle = Plugin.OffBoresightAngle_MMR.Value;
-            }
+            float offBoresightAngle = Plugin.GetOffBoresightAngle(missile.name);
             offBoresightAngle = Mathf.Max(1f, offBoresightAngle);
 
             Vector3 ownerForward = missile.owner.transform.forward;
@@ -417,8 +407,6 @@ namespace AIM9XMod.Patches
         [HarmonyPostfix]
         public static void IRSeeker_Initialize_Postfix(IRSeeker __instance)
         {
-            if (!Plugin.EnableLOAL.Value) return;
-
             // Note: 'missile' and 'targetUnit' are declared on the MissileSeeker base class,
             // not on IRSeeker itself. Traverse.Create(__instance).Field("fieldName") resolves
             // inherited fields by walking the type hierarchy, so these lookups work correctly
@@ -430,6 +418,9 @@ namespace AIM9XMod.Patches
                 Plugin.Log.LogWarning("[LOAL] IRSeeker_Initialize_Postfix: Traverse failed to resolve 'missile' field — skipping LOAL registration.");
                 return;
             }
+
+            if (!Plugin.IsLoalEnabledForMissile(missile.name))
+                return;
 
             int id = missile.GetInstanceID();
             loalSearchStart[id] = Time.timeSinceLevelLoad;
@@ -463,12 +454,7 @@ namespace AIM9XMod.Patches
                 Vector3 toTarget = targetUnit.transform.position - missile.transform.position;
                 float angle = Vector3.Angle(missile.transform.forward, toTarget);
 
-                float offBoresightAngle = Plugin.OffBoresightAngle_IR1.Value;
-                if (missile.name.Equals("AAM3")) {
-                    offBoresightAngle = Plugin.OffBoresightAngle_S2.Value;
-                } else if (missile.name.Equals("AAM1")) {
-                    offBoresightAngle = Plugin.OffBoresightAngle_MMR.Value;
-                }
+                float offBoresightAngle = Plugin.GetOffBoresightAngle(missile.name);
                 offBoresightAngle = Mathf.Max(1f, offBoresightAngle);
 
                 if (angle > offBoresightAngle)
@@ -493,8 +479,6 @@ namespace AIM9XMod.Patches
         [HarmonyPostfix]
         public static void IRSeeker_Seek_Postfix(IRSeeker __instance)
         {
-            if (!Plugin.EnableLOAL.Value) return;
-
             var t = Traverse.Create(__instance);
             var missile = t.Field("missile").GetValue<Missile>();
             if (missile == null)
@@ -502,6 +486,8 @@ namespace AIM9XMod.Patches
                 Plugin.Log.LogWarning("[LOAL] IRSeeker_Seek_Postfix: Traverse failed to resolve 'missile' field — skipping LOAL scan.");
                 return;
             }
+            if (!Plugin.IsLoalEnabledForMissile(missile.name))
+                return;
             if (missile.disabled) return;
 
             int id = missile.GetInstanceID();
@@ -778,9 +764,12 @@ namespace AIM9XMod.Patches
             out FlareEvasionSnapshot __state)
         {
             __state = default;
-            if (!Plugin.EnableLOAL.Value) return;
 
             var t = Traverse.Create(__instance);
+            var missile = t.Field("missile").GetValue<Missile>();
+            if (missile == null || !Plugin.IsLoalEnabledForMissile(missile.name))
+                return;
+
             var targetUnit = t.Field("targetUnit").GetValue<Unit>();
             var irTarget = t.Field("IRTarget").GetValue<IRSource>();
 
@@ -805,7 +794,7 @@ namespace AIM9XMod.Patches
             IRSeeker __instance,
             ref FlareEvasionSnapshot __state)
         {
-            if (!Plugin.EnableLOAL.Value || !__state.valid) return;
+            if (!__state.valid) return;
 
             var t = Traverse.Create(__instance);
             var missile = t.Field("missile").GetValue<Missile>();
@@ -814,6 +803,8 @@ namespace AIM9XMod.Patches
                 Plugin.Log.LogWarning("[LOAL] IRSeeker_OnTargetFlare_Postfix: Traverse failed to resolve 'missile' field — skipping flare evasion tracking.");
                 return;
             }
+            if (!Plugin.IsLoalEnabledForMissile(missile.name))
+                return;
 
             var currentIRTarget = t.Field("IRTarget").GetValue<IRSource>();
 
@@ -873,8 +864,6 @@ namespace AIM9XMod.Patches
         [HarmonyPrefix]
         public static bool IRSeeker_SlowChecks_Prefix(IRSeeker __instance)
         {
-            if (!Plugin.EnableLOAL.Value) return true;
-
             var t = Traverse.Create(__instance);
             var missile = t.Field("missile").GetValue<Missile>();
             if (missile == null)
@@ -882,6 +871,8 @@ namespace AIM9XMod.Patches
                 Plugin.Log.LogWarning("[LOAL] IRSeeker_SlowChecks_Prefix: Traverse failed to resolve 'missile' field — allowing vanilla SlowChecks.");
                 return true;
             }
+            if (!Plugin.IsLoalEnabledForMissile(missile.name))
+                return true;
             if (missile.disabled) return true;
 
             int id = missile.GetInstanceID();
