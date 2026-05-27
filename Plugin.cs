@@ -48,6 +48,7 @@ namespace AIM9XMod
         public static ConfigEntry<float> LaunchMuteSeconds;
         public static ConfigEntry<bool> ShowDetectionPercentDebug;
         public static ConfigEntry<bool> ShowLoalTargetDebug;
+        public static ConfigEntry<bool> ShowOffBoresightAngleDebug;
         public static ConfigEntry<float> PrelaunchCueAngle;
         public static ConfigEntry<float> WobbleMaxOffset;
         public static ConfigEntry<float> WobbleSpeed;
@@ -153,6 +154,8 @@ namespace AIM9XMod
             ShowLoalTargetDebug = Config.Bind("Debug", "ShowLoalTargetDebug", false,
                 "Log verbose LOAL target-assignment and scan details to BepInEx console. " +
                 "Enable when debugging diamond-target priority issues.");
+            ShowOffBoresightAngleDebug = Config.Bind("Debug", "ShowOffBoresightAngleDebug", false,
+                "Draw seeker off-boresight debug in HUD (current view angle vs selected missile limit).");
 
             WobbleMaxOffset = Config.Bind("Overlay", "WobbleMaxOffset", 14f,
                 "Maximum pixel displacement of the diamond target indicator when detection is at 0%%. " +

@@ -73,6 +73,7 @@ After first run, edit `BepInEx/config/com.modder.aim9xmod.cfg` or use an in-game
 | Audio | LaunchMuteSeconds | 0.5 | Temporarily mutes growl after detecting a player IR launch. |
 | Debug | ShowDetectionPercentDebug | false | Shows seeker percentage text in the HUD and emits seeker-state debug logs. |
 | Debug | ShowLoalTargetDebug | false | Logs verbose LOAL target assignment and scan decisions. |
+| Debug | ShowOffBoresightAngleDebug | false | Draws current viewed off-boresight angle vs selected missile off-boresight angle in the HUD. |
 | Overlay | WobbleMaxOffset | 14 | Maximum pixel wobble of the target diamond at low detection strength. |
 | Overlay | WobbleSpeed | 1.3 | Speed multiplier for overlay diamond wobble. |
 
@@ -104,3 +105,4 @@ After first run, edit `BepInEx/config/com.modder.aim9xmod.cfg` or use an in-game
 
 - `ShowDetectionPercentDebug = true` adds seeker strength text to the overlay and periodic `[SeekerDebug]` / `[SeekerState]` logs.
 - `ShowLoalTargetDebug = true` adds `[LOAL-DBG]` logs covering launch assignment, candidate rejection reasons, and preferred-target overrides.
+- `ShowOffBoresightAngleDebug = true` draws a HUD debug readout and gauge for current viewed off-boresight angle vs selected missile off-boresight angle.

@@ -132,7 +132,7 @@ namespace AIM9XMod.Services
                 SilenceGrowl();
                 SeekerCueState.ClearPrelaunchCue();
                 if (_overlay != null)
-                    _overlay.SetCueVisible(false, null, 0f, 0f, false, false, true, false, null);
+                    _overlay.SetCueVisible(false, null, 0f, 0f, false, false, true, false, null, 0f, 0f);
                 return;
             }
 
@@ -298,7 +298,7 @@ namespace AIM9XMod.Services
 
         private void UpdateGrowlFromCue(bool irMissileSelected, Aircraft ownAircraft, WeaponStation ws, Vector3 viewDir, bool targetSlavedMode, bool hasRadarHardLock, List<Unit> assignmentTargets)
         {
-            bool viewCenterInCone = IsViewCenterWithinAircraftForwardCone(ownAircraft, viewDir, ws);
+            bool viewCenterInCone = IsViewCenterWithinSelectedMissileCone(ownAircraft, viewDir, ws, out var viewedOffBoresightAngleDeg, out var selectedMissileOffBoresightAngleDeg);
 
             // When radar lock is active but the target has left the offboresight angle area,
             // hide the manual view lock circles so they don't mislead the pilot.
@@ -309,7 +309,7 @@ namespace AIM9XMod.Services
             {
                 SilenceGrowl();
                 if (_overlay != null)
-                    _overlay.SetCueVisible(false, null, 0f, 0f, false, false, viewCenterInCone, false, null);
+                    _overlay.SetCueVisible(false, null, 0f, 0f, false, false, viewCenterInCone, false, null, viewedOffBoresightAngleDeg, selectedMissileOffBoresightAngleDeg);
                 _lastInFlightIrCount = 0;
                 return;
             }
@@ -368,7 +368,7 @@ namespace AIM9XMod.Services
             {
                 SilenceGrowl();
                 if (_overlay != null)
-                    _overlay.SetCueVisible(true, hasCue ? cue.target : null, Mathf.Max(0.2f, cueStrength), detectionRate, searchMode, targetSlavedMode, viewCenterInCone, flareInCone, assignmentTargets);
+                    _overlay.SetCueVisible(true, hasCue ? cue.target : null, Mathf.Max(0.2f, cueStrength), detectionRate, searchMode, targetSlavedMode, viewCenterInCone, flareInCone, assignmentTargets, viewedOffBoresightAngleDeg, selectedMissileOffBoresightAngleDeg);
                 return;
             }
 
@@ -423,11 +423,14 @@ namespace AIM9XMod.Services
             }
 
             if (_overlay != null)
-                _overlay.SetCueVisible(true, hasCue ? cue.target : null, Mathf.Max(0.2f, cueStrength), detectionRate, searchMode, targetSlavedMode, viewCenterInCone, flareInCone, assignmentTargets);
+                _overlay.SetCueVisible(true, hasCue ? cue.target : null, Mathf.Max(0.2f, cueStrength), detectionRate, searchMode, targetSlavedMode, viewCenterInCone, flareInCone, assignmentTargets, viewedOffBoresightAngleDeg, selectedMissileOffBoresightAngleDeg);
         }
 
-        private static bool IsViewCenterWithinAircraftForwardCone(Aircraft ownAircraft, Vector3 viewDir, WeaponStation ws)
+        private static bool IsViewCenterWithinSelectedMissileCone(Aircraft ownAircraft, Vector3 viewDir, WeaponStation ws, out float viewedOffBoresightAngleDeg, out float selectedMissileOffBoresightAngleDeg)
         {
+            viewedOffBoresightAngleDeg = 0f;
+            selectedMissileOffBoresightAngleDeg = 0f;
+
             if (ownAircraft == null)
                 return false;
 
@@ -437,10 +440,10 @@ namespace AIM9XMod.Services
             if (ws == null || ws.WeaponInfo == null)
                 return false;
 
-            float offBoresightAngle = Plugin.GetOffBoresightAngle(ws.WeaponInfo.name);
-            offBoresightAngle = Mathf.Max(1f, offBoresightAngle);
+            selectedMissileOffBoresightAngleDeg = Mathf.Max(1f, Plugin.GetOffBoresightAngle(ws.WeaponInfo.name));
+            viewedOffBoresightAngleDeg = Vector3.Angle(ownAircraft.transform.forward, viewDir.normalized);
 
-            return Vector3.Angle(ownAircraft.transform.forward, viewDir.normalized) <= offBoresightAngle;
+            return viewedOffBoresightAngleDeg <= selectedMissileOffBoresightAngleDeg;
         }
 
         private void SilenceGrowl()

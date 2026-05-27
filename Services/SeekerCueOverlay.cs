@@ -15,9 +15,11 @@ namespace AIM9XMod.Services
         private readonly List<Unit> _assignedTargets = new List<Unit>(8);
         private float _strength;
         private float _detectionRate;
+        private float _viewedOffBoresightAngleDeg;
+        private float _selectedMissileOffBoresightAngleDeg;
         private GUIStyle _style;
 
-        public void SetCueVisible(bool visible, Unit target, float strength, float detectionRate, bool searchMode, bool targetSlaved, bool viewCenterInCone, bool flareInCone, List<Unit> assignedTargets)
+        public void SetCueVisible(bool visible, Unit target, float strength, float detectionRate, bool searchMode, bool targetSlaved, bool viewCenterInCone, bool flareInCone, List<Unit> assignedTargets, float viewedOffBoresightAngleDeg, float selectedMissileOffBoresightAngleDeg)
         {
             _visible = visible;
             _target = target;
@@ -27,6 +29,8 @@ namespace AIM9XMod.Services
             _targetSlaved = targetSlaved;
             _viewCenterInCone = viewCenterInCone;
             _flareInCone = flareInCone;
+            _viewedOffBoresightAngleDeg = Mathf.Max(0f, viewedOffBoresightAngleDeg);
+            _selectedMissileOffBoresightAngleDeg = Mathf.Max(0f, selectedMissileOffBoresightAngleDeg);
 
             _assignedTargets.Clear();
             if (assignedTargets != null)
@@ -103,6 +107,30 @@ namespace AIM9XMod.Services
                 GUI.Label(new Rect(cx - 180f, cy + lockRadius + 8f, 360f, 24f), "SEEKER: " + label + debugSuffix, _style);
                 GUI.Label(new Rect(cx - 180f, cy + lockRadius + 25f, 360f, 24f), "STR: " + _strength.ToString() + debugSuffix, _style);
             }
+
+            if (Plugin.ShowOffBoresightAngleDebug != null && Plugin.ShowOffBoresightAngleDebug.Value)
+                DrawOffBoresightDebug(cx, cy, lockRadius);
+        }
+
+        private void DrawOffBoresightDebug(float cx, float cy, float lockRadius)
+        {
+            float viewed = _viewedOffBoresightAngleDeg;
+            float selected = _selectedMissileOffBoresightAngleDeg;
+            string status = _viewCenterInCone ? "IN-CONE" : "OUT-OF-CONE";
+
+            GUI.Label(new Rect(cx - 220f, cy + lockRadius + 44f, 440f, 24f),
+                "OBS VIEW: " + viewed.ToString("F1") + "°  MISSILE: " + selected.ToString("F1") + "°  " + status, _style);
+
+            float gaugeWidth = 320f;
+            float gaugeHeight = 10f;
+            float gx = cx - gaugeWidth * 0.5f;
+            float gy = cy + lockRadius + 68f;
+
+            DrawRect(new Rect(gx, gy, gaugeWidth, gaugeHeight), new Color(0.08f, 1f, 0.08f, 0.18f));
+
+            float normalized = selected > 0.001f ? Mathf.Clamp01(viewed / selected) : 0f;
+            Color marker = _viewCenterInCone ? new Color(0.08f, 1f, 0.08f, 0.92f) : new Color(1f, 0.26f, 0.08f, 0.92f);
+            DrawRect(new Rect(gx, gy, gaugeWidth * normalized, gaugeHeight), marker);
         }
 
         private Vector2 ComputeWobbleOffset()
@@ -203,6 +231,7 @@ namespace AIM9XMod.Services
         }
 
         private static Texture2D _lineTexture;
+        private static Texture2D _rectTexture;
 
         private static void DrawLine(Vector2 p0, Vector2 p1, float thickness)
         {
@@ -221,6 +250,21 @@ namespace AIM9XMod.Services
             GUIUtility.RotateAroundPivot(angle, p0);
             GUI.DrawTexture(new Rect(p0.x, p0.y, length, thickness), _lineTexture);
             GUI.matrix = matrix;
+        }
+
+        private static void DrawRect(Rect rect, Color color)
+        {
+            if (_rectTexture == null)
+            {
+                _rectTexture = new Texture2D(1, 1, TextureFormat.ARGB32, false);
+                _rectTexture.SetPixel(0, 0, Color.white);
+                _rectTexture.Apply();
+            }
+
+            var previous = GUI.color;
+            GUI.color = color;
+            GUI.DrawTexture(rect, _rectTexture);
+            GUI.color = previous;
         }
     }
 }
