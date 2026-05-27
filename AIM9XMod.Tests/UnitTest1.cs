@@ -61,3 +61,21 @@ public class SeekerCueMathTests
         Assert.Equal(0f, wobbleFactor);
     }
 }
+
+public class MissileTypeResolverTests
+{
+    [Theory]
+    [InlineData("AAM1", MissileType.MMR_S3)]
+    [InlineData("AAM1_Custom", MissileType.MMR_S3)]
+    [InlineData("MMR-S3 Variant", MissileType.MMR_S3)]
+    [InlineData("AAM3", MissileType.IRM_S2)]
+    [InlineData("IRM-S2 tuned", MissileType.IRM_S2)]
+    [InlineData("SAM_IR1", MissileType.IRM_S1)]
+    [InlineData("", MissileType.IRM_S1)]
+    public void Resolve_MapsWeaponNamesToMissileTypes(string weaponName, MissileType expected)
+    {
+        var type = MissileTypeResolver.Resolve(weaponName);
+        Assert.Equal(expected, type);
+    }
+
+}

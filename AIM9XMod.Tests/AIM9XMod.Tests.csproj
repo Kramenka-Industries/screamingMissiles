@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <Compile Include="..\Logic\SeekerCueMath.cs" Link="Logic\SeekerCueMath.cs" />
+    <Compile Include="..\Logic\MissileTypeResolver.cs" Link="Logic\MissileTypeResolver.cs" />
   </ItemGroup>
 
 </Project>
